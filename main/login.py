@@ -1,31 +1,42 @@
-import tkinter as tk
+import sys
 
-root = tk.Tk()
-root.title("Login")
-root.geometry("500x350+500+200")
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QApplication
 
-def close_window():
-    root.destroy()
 
-def get_username():
-    input_username = enter_username.get()
+class LoginWindow(QWidget):
+    def __init__ (self):
+        super().__init__()
 
-def get_password():
-    input_username = enter_password.get()
+        self.setWindowTitle("Login")
+        self.setGeometry(750, 350,500,350)
 
-login_label = tk.Label(root, text="Log In",font=("Times",40))
-login_label.place(x=180, y=12)
+        login_label = QLabel("Log In",self)
+        login_label.setFont(QFont("Tahoma",40))
+        login_label.move(150, 12)
 
-enter_username = tk.Text(root, width=50, height=1.5, font=("Arial",10))
-enter_username.place(x=50,y=100)
+        self.enter_username = QLineEdit(self)
+        self.enter_username.setPlaceholderText("Username")
+        self.enter_username.setFont(QFont("Arial", 10))
+        self.enter_username.setGeometry(50,120,400,40)
 
-enter_password = tk.Text(root, width=50, height=1.5, font=("Arial",10))
-enter_password.place(x=50,y=160)
+        self.enter_password = QLineEdit(self)
+        self.enter_password.setPlaceholderText("Password")
+        self.enter_password.setFont(QFont("Arial",10))
+        self.enter_password.setEchoMode(QLineEdit.Password)
+        self.enter_password.setGeometry(50,180,400,40)
 
-login = tk.Button(root, text="Log In",
-                      font=("Arial",12), width=30, height=2,
-                      bg="black",fg="white",
-                      command=close_window)
-login.place(x=115,y=250)
+        login_button = QPushButton("Log In",self)
+        login_button.setFont(QFont("Tahoma", 15))
+        login_button.setStyleSheet("background-color: black; color:white;")
+        login_button.setGeometry(115, 260, 270, 50)
+        login_button.clicked.connect(self.close_window)
 
-root.mainloop()
+    def close_window(self):
+        self.close()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = LoginWindow()
+    window.show()
+    sys.exit(app.exec_())

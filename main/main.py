@@ -4,7 +4,10 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QPixmap
 
-class MyWindow(QWidget):
+from login import LoginWindow
+
+
+class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -25,14 +28,15 @@ class MyWindow(QWidget):
         click_here_button.setStyleSheet("color:black; background-color: white")
         click_here_button.adjustSize()
         click_here_button.move(160,400)
+        click_here_button.clicked.connect(self.open_login_window)
 
-        click_here_button.clicked.connect(self.close_window)
-
-    def close_window(self):
+    def open_login_window(self):
         self.close()
+        self.login_window = LoginWindow()
+        self.login_window.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = MyWindow()
+    window = MainWindow()
     window.show()
     sys.exit(app.exec())

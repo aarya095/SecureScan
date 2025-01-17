@@ -12,8 +12,8 @@ class DatabaseConnection:
         self.connection = None
 
     def connect_to_database(self):
-
         try:
+            print("Connecting to the database...")
             self.connection = mysql.connector.connect(
                 host=self.host,
                 user=self.user,
@@ -21,7 +21,10 @@ class DatabaseConnection:
                 database=self.database
             )
             if self.connection.is_connected():
-                print("Successfully connected to database.")
+                print("Successfully connected to the database.")
+            else:
+                print("Failed to connect to the database.")
+                self.connection = None
         except Error as e:
             print(f"Error connecting to MySQL: {e}")
             self.connection = None
@@ -37,16 +40,28 @@ class DatabaseConnection:
         return self.connection
 
     def execute_query(self, query, params=None):
-
+        if not self.connection:
+            raise ValueError("Database connection is not established.")
         cursor = self.connection.cursor()
-        cursor.execute(query, params)
-        self.connection.commit()
-        cursor.close()
+
+        try:
+            cursor.execute(query, params)
+            self.connection.commit()
+        except Error as e:
+            print(f"Error executing query:{e}")
+        finally:
+            cursor.close()
 
     def fetch_all(self, query, params=None):
+        if not self.connection:
+            raise ValueError("Database connection is not established.")
 
-        cursor = self.connection.cursor()
-        cursor.execute(query, params)
-        result=cursor.fetchall()
-        cursor.close()
-        return result
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(query, params)
+            result=cursor.fetchall()
+            cursor.close()
+            return result
+        except Error as e:
+            print(f"Database error: {e}")
+            return None

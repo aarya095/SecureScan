@@ -1,82 +1,68 @@
-import sys
-from PyQt5.QtCore import QThread, pyqtSignal
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QMessageBox
+import tkinter as tk
+from tkinter import messagebox
 from database.db_connection import DatabaseConnection
+import bcrypt
+import sys
 
-class DatabaseThread(QThread):
-    result_signal = pyqtSignal(str)
+class LoginWindow(tk.Toplevel):
 
-    def __init__(self, query, params):
-        super().__init__()
-        self.query = query
-        self.params = params
-        self.db_connection = DatabaseConnection()
-        self.db_connection.connect_to_database()
+    def __init__(self, master):
+        super().__init__(master)
 
-    def run(self):
-        if not self.db_connection.get_connection():
-            self.result_signal.emit("Failed to connect to the database.")
-            return
+        self.title("Log In")
+        self.geometry("400x300+550+250")
 
-        try:
-            result = self.db_connection.fetch_all(self.query, self.params)
-            if result:
-                self.result_signal.emit(f"Query Result: {result}")
-            else:
-                self.result_signal.emit("No results found.")
-        except Exception as e:
-            self.result_signal.emit(f"Error: {str(e)}")
+        tk.Label(self, text="Log In", font=("Tahoma", 20)).place(x=150,y=20)
 
-class LoginWindow(QWidget):
-    def __init__(self):
-        super().__init__()
+        tk.Label(self, text="Username:", font=("Arial", 12)).place(x=50, y=80)
+        self.enter_username = tk.Entry(self, font=("Arial", 12))
+        self.enter_username.place(x=150, y=80, width=200)
 
-        self.setWindowTitle("Login")
-        self.setGeometry(750, 350, 500, 350)
+        tk.Label(self, text="Password:", font=("Arial", 12)).place(x=50, y=120)
+        self.enter_password = tk.Entry(self, font=("Arial", 12), show="*")
+        self.enter_password.place(x=150, y=120, width=200)
 
-        login_label = QLabel("Log In", self)
-        login_label.setFont(QFont("Tahoma", 40))
-        login_label.move(150, 12)
+        login_button = tk.Button(self, text="Log In", font=("Tahoma",14), bg="black",fg="white",
+                                 command=self.verify_user_credentials)
+        login_button.place(x=150, y=180)
 
-        self.enter_username = QLineEdit(self)
-        self.enter_username.setPlaceholderText("Username")
-        self.enter_username.setFont(QFont("Arial", 10))
-        self.enter_username.setGeometry(50, 120, 400, 40)
-
-        self.enter_password = QLineEdit(self)
-        self.enter_password.setPlaceholderText("Password")
-        self.enter_password.setFont(QFont("Arial", 10))
-        self.enter_password.setEchoMode(QLineEdit.Password)
-        self.enter_password.setGeometry(50, 180, 400, 40)
-
-        login_button = QPushButton("Log In", self)
-        login_button.setFont(QFont("Tahoma", 15))
-        login_button.setStyleSheet("background-color: black; color:white;")
-        login_button.setGeometry(115, 260, 270, 50)
-        login_button.clicked.connect(self.verify_user_credentials)
+        self.protocol("WM_DELETE_WINDOW", sys.exit)
 
     def verify_user_credentials(self):
-        username = self.enter_username.text()
-        password = self.enter_password.text()
+        username = self.enter_username.get().strip()
+        password = self.enter_password.get().strip()
 
         if not username or not password:
-            QMessageBox.warning(self, "Input Error", "Username or password cannot be empty")
+            messagebox.showwarning("Login Failed","Please enter both username and password")
             return
 
-        query = "SELECT * FROM login WHERE username=%s AND password=%s"
-        params = (username, password)
+        db = DatabaseConnection()
+        db.connect_to_database()
 
-        # Run the database query in a separate thread
-        self.db_thread = DatabaseThread(query, params)
-        self.db_thread.result_signal.connect(self.handle_query_result)
-        self.db_thread.start()
+        if db.connection:
+            query = "select password from login where username=%s"
+            result = db.fetch_all(query, (username,))
 
-    def handle_query_result(self, message):
-        QMessageBox.information(self, "Query Result", message)
+            db.close_connection()
+
+            if result:
+                stored_hashed_password = result[0][0]
+
+                if bcrypt.checkpw(password.encode(), stored_hashed_password.encode()):
+                    messagebox.showinfo("Login Success","Welcome to Secure Scan")
+                    self.destroy()
+                    self.master.destroy()
+                else:
+                    messagebox.showerror("Login Failed", "Invalid username or password")
+
+            else:
+                messagebox.showerror("Login Failed","Invalid username or password")
+        else:
+            messagebox.showerror("Database Error","Could not connect to database")
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = LoginWindow()
-    window.show()
-    sys.exit(app.exec_())
+    root = tk.Tk()
+    root.withdraw()
+
+    login_window = LoginWindow(root)
+    login_window.mainloop()

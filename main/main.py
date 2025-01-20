@@ -1,7 +1,8 @@
+import sys
 import tkinter as tk
-from tkinter import Toplevel
-
 import os
+
+from login.login import LoginWindow
 
 
 class MainWindow(tk.Tk):
@@ -12,19 +13,19 @@ class MainWindow(tk.Tk):
         self.geometry("700x500+450+150")
         self.configure(bg="lightblue")
 
-
-
-        # Create image label
         label = tk.Label(self, bg="lightblue")
         label.pack(pady=20)
 
-        # Button
         button = tk.Button(self, text="Click Here To Continue", font=("Verdana", 16),
                            bg="white", fg="black", command=self.open_login_window)
-        button.pack(pady=20)
+        button.place(x=220, y=400)
+
+        self.protocol("WM_DELETE_WINDOW", sys.exit)
 
     def open_login_window(self):
-        self.withdraw()  # Hide the main window
+        self.withdraw()
+        login_window = LoginWindow(self)
+        login_window.grab_set()
 
 if __name__ == "__main__":
     app = MainWindow()

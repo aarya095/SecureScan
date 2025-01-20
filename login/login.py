@@ -12,19 +12,19 @@ class LoginWindow(tk.Toplevel):
         self.title("Log In")
         self.geometry("400x300+550+250")
 
-        tk.Label(self, text="Log In", font=("Tahoma", 20)).place(x=150,y=20)
+        tk.Label(self, text="Log In", font=("Tahoma", 30)).place(x=150,y=20)
 
-        tk.Label(self, text="Username:", font=("Arial", 12)).place(x=50, y=80)
+        tk.Label(self, text="Username:", font=("Arial", 12)).place(x=50, y=100)
         self.enter_username = tk.Entry(self, font=("Arial", 12))
-        self.enter_username.place(x=150, y=80, width=200)
+        self.enter_username.place(x=150, y=100, width=200)
 
-        tk.Label(self, text="Password:", font=("Arial", 12)).place(x=50, y=120)
+        tk.Label(self, text="Password:", font=("Arial", 12)).place(x=50, y=140)
         self.enter_password = tk.Entry(self, font=("Arial", 12), show="*")
-        self.enter_password.place(x=150, y=120, width=200)
+        self.enter_password.place(x=150, y=140, width=200)
 
         login_button = tk.Button(self, text="Log In", font=("Tahoma",14), bg="black",fg="white",
                                  command=self.verify_user_credentials)
-        login_button.place(x=150, y=180)
+        login_button.place(x=160, y=200)
 
         self.protocol("WM_DELETE_WINDOW", sys.exit)
 

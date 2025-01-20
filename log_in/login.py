@@ -4,6 +4,7 @@ from database.db_connection import DatabaseConnection
 import bcrypt
 import sys
 
+
 class LoginWindow(tk.Toplevel):
 
     def __init__(self, master):
@@ -26,7 +27,17 @@ class LoginWindow(tk.Toplevel):
                                  command=self.verify_user_credentials)
         login_button.place(x=160, y=200)
 
+        forgot_password_button = tk.Button(self, text="Forgot Password?", font=("Tahoma", 14), bg="black", fg="white",
+                                 command=self.open_forgot_password_window)
+        forgot_password_button.place(x=120, y=250)
+
         self.protocol("WM_DELETE_WINDOW", sys.exit)
+
+    def open_forgot_password_window(self):
+        from log_in.forgot_password import ForgotPasswordWindow
+
+        forgot_password_window = ForgotPasswordWindow(self)
+        forgot_password_window.grab_set()
 
     def verify_user_credentials(self):
         username = self.enter_username.get().strip()

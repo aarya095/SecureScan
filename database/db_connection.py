@@ -5,7 +5,7 @@ from mysql.connector import Error
 class DatabaseConnection:
     def __init__(self):
 
-        self.host = os.getenv('DB_HOST') #env: environment variables
+        self.host = os.getenv('DB_HOST')
         self.user = os.getenv('DB_USER')
         self.password = os.getenv('DB_PASSWORD')
         self.database = os.getenv('DB_NAME')
@@ -65,3 +65,10 @@ class DatabaseConnection:
         except Error as e:
             print(f"Database error: {e}")
             return None
+
+    def fetch_user_email(self, username):
+        query = "SELECT email FROM login WHERE username = %s"
+        result = self.fetch_all(query, (username,))
+        if result:
+            return result[0][0]  # Assuming email is in the first column
+        return None

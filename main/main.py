@@ -2,7 +2,7 @@ import sys
 import tkinter as tk
 import os
 
-from login.login import LoginWindow
+from log_in.login import LoginWindow
 
 
 class MainWindow(tk.Tk):
